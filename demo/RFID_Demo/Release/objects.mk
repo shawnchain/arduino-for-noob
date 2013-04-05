@@ -4,5 +4,5 @@
 
 USER_OBJS :=
 
-LIBS := -l"Arduino_Mega_2560_or_Mega_ADK"
+LIBS := -l""
 

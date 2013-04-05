@@ -79,7 +79,6 @@ void LCD5110::init(void) {
 	// Reset
 	if(LCD_RST>0){
 		pinMode(LCD_RST,OUTPUT);
-		digitalWrite(LCD_RST,LOW);
 		digitalWrite(LCD_RST, LOW);
 		delayMicroseconds(1);
 		digitalWrite(LCD_RST, HIGH);
