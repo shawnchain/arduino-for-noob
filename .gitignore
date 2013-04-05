@@ -1,3 +1,5 @@
-/*.o
-/.DS_Store
+*.o
+.settings
+.DS_Store
+Release
 
