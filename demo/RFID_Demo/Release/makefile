@@ -65,7 +65,7 @@ sizedummy \
 all: RFID_Demo.elf secondary-outputs
 
 dependents:
-	-cd /Users/shawn/Arduino/workspace/Arduino_Mega_2560_or_Mega_ADK/Release && $(MAKE) clean all
+	-cd /Users/shawn/Arduino/workspace/Arduino_Mega_2560_or_Mega_ADK/Release && $(MAKE) all
 
 # Tool invocations
 RFID_Demo.elf: $(OBJS) $(USER_OBJS) /Users/shawn/Arduino/workspace/Arduino_Mega_2560_or_Mega_ADK/Release/libArduino_Mega_2560_or_Mega_ADK.a

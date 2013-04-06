@@ -6,11 +6,25 @@
 
 #ifndef RFID_Demo_H_
 #define RFID_Demo_H_
-#include "Arduino.h"
-//add your includes for the project RFID_Demo here
 
+#include <Arduino.h>
+#include <LCD/LCD5110.h>
+#include "Menu.h"
 
-//end of add your includes here
+// Eliminate the GCC warning
+#ifdef PROGMEM
+#undef PROGMEM
+#define PROGMEM __attribute__((section(".progmem.data")))
+#endif
+
+// Choose different Arduino boards
+#define MEGA_2560 1
+#define PROMINI_328 0
+
+// Shared components
+extern Menu menu;
+extern LCD5110 lcd;
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -19,11 +33,6 @@ void setup();
 #ifdef __cplusplus
 } // extern "C"
 #endif
-
-//add your function definitions for the project RFID_Demo here
-
-
-
 
 //Do not add code below this line
 #endif /* RFID_Demo_H_ */

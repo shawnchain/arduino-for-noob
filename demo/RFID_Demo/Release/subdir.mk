@@ -4,16 +4,19 @@
 
 # Add inputs and outputs from these tool invocations to the build variables 
 CPP_SRCS += \
+../DemoApp.cpp \
 ../Menu.cpp \
-../RFID_Demo.cpp 
+../RFIDModule.cpp 
 
 OBJS += \
+./DemoApp.o \
 ./Menu.o \
-./RFID_Demo.o 
+./RFIDModule.o 
 
 CPP_DEPS += \
+./DemoApp.d \
 ./Menu.d \
-./RFID_Demo.d 
+./RFIDModule.d 
 
 
 # Each subdirectory must supply rules for building sources it contributes

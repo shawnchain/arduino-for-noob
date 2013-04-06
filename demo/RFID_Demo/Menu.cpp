@@ -79,8 +79,8 @@ void Menu::leave(){
 		Serial.println(buf);
 #endif
 		_menuLevel--;
-		updateLCD(0);
 	}
+	updateLCD(0);
 }
 
 MenuItem*  Menu::currentItem(void){
