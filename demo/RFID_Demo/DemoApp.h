@@ -7,6 +7,13 @@
 #ifndef RFID_Demo_H_
 #define RFID_Demo_H_
 
+// Choose different Arduino boards
+//#define MEGA_2560 1
+//#define PROMINI_328 0
+//#define BOARD arduino_mega_2560
+//#define BOARD arduino_promini_328
+
+
 #include <Arduino.h>
 #include <LCD/LCD5110.h>
 #include "Menu.h"
@@ -16,10 +23,6 @@
 #undef PROGMEM
 #define PROGMEM __attribute__((section(".progmem.data")))
 #endif
-
-// Choose different Arduino boards
-#define MEGA_2560 1
-#define PROMINI_328 0
 
 // Shared components
 extern Menu menu;

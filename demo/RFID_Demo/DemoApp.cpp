@@ -3,6 +3,7 @@
 
 #include <Keypad/AnalogKeypad.h>
 #include "RFIDModule.h"
+#include "GPS/GPS.h"
 
 //---------------------------
 // Modules
@@ -13,22 +14,26 @@ RFIDModule rfidModule;
 // App Menu/LCD/Keypad setup
 //---------------------------
 // LCD setup (pins)
-#if MEGA_2560
-#define LCD_RST 6
-#define LCD_CE 5
-#define LCD_DC 4
-#define LCD_DIN 3
-#define LCD_CLK 2
-#define LCD_BL 7
+#ifndef BOARD
+	#warning Board type not defined, using -DBOARD=xxx to specify one. Supported board types: arduion_mega_2560, arduino_promini_328
+	#define BOARD arduion_mega_2560
 #endif
-#if PROMINI_320
-#define LCD_RST A3
-#define LCD_CE 2
-#define LCD_DC 3
-#define LCD_DIN 4
-#define LCD_CLK 5
-#define LCD_BL 6
+#if BOARD == arduino_mega_2560
+		#define LCD_RST 6
+		#define LCD_CE 5
+		#define LCD_DC 4
+		#define LCD_DIN 3
+		#define LCD_CLK 2
+		#define LCD_BL 7
+	#elif BOARD == arduino_promini_328
+		#define LCD_RST A3
+		#define LCD_CE 2
+		#define LCD_DC 3
+		#define LCD_DIN 4
+		#define LCD_CLK 5
+		#define LCD_BL 6
 #endif
+
 LCD5110 lcd(LCD_RST, LCD_CE, LCD_DC, LCD_DIN, LCD_CLK, LCD_BL);
 
 // Keypad setup
@@ -36,11 +41,16 @@ LCD5110 lcd(LCD_RST, LCD_CE, LCD_DC, LCD_DIN, LCD_CLK, LCD_BL);
 AnalogKeypad keypad(KEYPAD_INPUT);
 bool keypad_callback(Keycode keycode);
 
+// GPS module
+GPS gps(19,18);
+
 // Menus
 bool mHello(void* item);
 bool mSettings_backlight(void* item);
 bool mAbout(void* item);
 bool mBack(void* item);
+bool mGPS(void* item);
+
 
 //MenuItem menu_a1[] = {
 //		{"A-1-1","",mHello,0},
@@ -76,6 +86,7 @@ MenuItem menu_settings[] = {
 		{NULL,NULL,NULL,NULL}
 } ;
 MenuItem menu_root[] = {
+		{"GPS Monitor","",mGPS,0},
 		{"RPi Monitor","",mHello,0},
 		{"RFID Reader","",mHello,0},
 		{"Settings","",0,menu_settings},
@@ -102,11 +113,16 @@ void setup() {
 
 	// RFID module setup
 	rfidModule.setup();
+
+	// GPS module setup
+	gps.init();
 }
 
 void loop(){
 	keypad.runloop();
 	rfidModule.loop();
+
+	gps.loop();
 }
 
 //-----------------------------------------
@@ -140,6 +156,16 @@ bool keypad_callback(Keycode keycode){
 		break;
 	}
 	return true; // done, do not repeat.
+}
+
+bool mGPS(void* item){
+	lcd.clear();
+	lcd.drawString(25,0,"GPS Info",true);
+	char buf[128];
+	snprintf(buf,128,"%s",((MenuItem*)item)->title);
+//	Serial.println(buf);
+	lcd.drawString(0,2,buf);
+	return true;
 }
 
 bool mHello(void* item){

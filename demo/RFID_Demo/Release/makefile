@@ -12,6 +12,7 @@ RM := rm -rf
 -include JOYLABS_ARDUINO_LIBS/RFID/subdir.mk
 -include JOYLABS_ARDUINO_LIBS/LCD/subdir.mk
 -include JOYLABS_ARDUINO_LIBS/Keypad/subdir.mk
+-include JOYLABS_ARDUINO_LIBS/GPS/subdir.mk
 -include subdir.mk
 -include objects.mk
 
@@ -65,7 +66,7 @@ sizedummy \
 all: RFID_Demo.elf secondary-outputs
 
 dependents:
-	-cd /Users/shawn/Arduino/workspace/Arduino_Mega_2560_or_Mega_ADK/Release && $(MAKE) all
+	-cd /Users/shawn/Arduino/workspace/Arduino_Mega_2560_or_Mega_ADK/Release && $(MAKE) clean all
 
 # Tool invocations
 RFID_Demo.elf: $(OBJS) $(USER_OBJS) /Users/shawn/Arduino/workspace/Arduino_Mega_2560_or_Mega_ADK/Release/libArduino_Mega_2560_or_Mega_ADK.a

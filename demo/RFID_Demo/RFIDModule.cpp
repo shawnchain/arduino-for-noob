@@ -14,20 +14,25 @@
 #include <RFID/MFRC522.h>
 
 // RFID Pin setup
-// 2560 mega
-#if MEGA_2560
-#define RFID_SS 53  // SPI device select
-#define RFID_RST A5 // device reset
-// The beep pin
-#define PinBEEP A9
+#ifndef BOARD
+	#warning Board type not defined, using -DBOARD=xxx to specify one. Supported board types: arduion_mega_2560, arduino_promini_328
+	#define BOARD arduion_mega_2560
 #endif
-// 328 pro mini
-#if PROMINI_328
-#define RFID_SS 10  // SPI device select
-#define RFID_RST 9 // device reset
-// The beep pin
-#define PinBEEP A2
+
+#ifdef BOARD
+	#if BOARD == arduino_mega_2560
+		#define RFID_SS 53  // SPI device select
+		#define RFID_RST A5 // device reset
+		// The beep pin
+		#define PinBEEP A9
+	#elif BOARD == arduino_promini_328
+		#define RFID_SS 10  // SPI device select
+		#define RFID_RST 9 // device reset
+		// The beep pin
+		#define PinBEEP A2
+	#endif
 #endif
+
 /////////////////////////////////////////////////////////////////////
 //set the pin
 /////////////////////////////////////////////////////////////////////
