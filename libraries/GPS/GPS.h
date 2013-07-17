@@ -8,29 +8,43 @@
 #ifndef GPS_H_
 #define GPS_H_
 #include <stdint.h>
+#include "SoftwareSerial.h"
+#include "HardwareSerial.h"
 
-class HardwareSerial;
+
+class LCD5110;
+
+class GPSInfo{
+	char* lat;
+	char* lon;
+	char* alt;
+};
+
+typedef void (*GPSCallback)(GPSInfo&);
 
 class GPS {
 public:
-	GPS(uint8_t txPin, uint8_t rxPin);
+	GPS(SoftwareSerial *gpsPort, LCD5110 *lcd, GPSCallback callback);
 	void init(void);
 	void loop(void);
 	void reset(void);
 
 private:
-	uint8_t _rxPin;
-	uint8_t _txPin;
-	int _byteGPS;
-	const char* _cmd;
+
 	int _counter1; // counts how many bytes were received (max 300)
 	int _counter2; // counts how many commas were seen
 	int _offsets[13];
 	char _buf[300];
+	GPSCallback _callback;
 
 	int getSize(uint8_t offset);
 	int handleByte(int byteGPS);
-	HardwareSerial *_pSerial;
+
+	SoftwareSerial *_gpsPort;
+
+	LCD5110 *_lcd;
+
+	GPSInfo _gpsInfo;
 };
 
 #endif /* GPS_H_ */
