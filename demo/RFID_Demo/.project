@@ -37,6 +37,11 @@
 			<type>2</type>
 			<locationURI>ArduinoLibPath/SPI</locationURI>
 		</link>
+		<link>
+			<name>SoftwareSerial</name>
+			<type>2</type>
+			<locationURI>ArduinoLibPath/SoftwareSerial</locationURI>
+		</link>
 	</linkedResources>
 	<variableList>
 		<variable>

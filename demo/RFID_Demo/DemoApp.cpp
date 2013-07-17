@@ -1,7 +1,5 @@
 // Do not remove the include below
 #include "DemoApp.h"
-
-#include <Keypad/AnalogKeypad.h>
 #include "RFIDModule.h"
 #include "GPS/GPS.h"
 
@@ -9,6 +7,7 @@
 // Modules
 //---------------------------
 RFIDModule rfidModule;
+bool rfid_activated;
 
 //---------------------------
 // App Menu/LCD/Keypad setup
@@ -38,18 +37,31 @@ LCD5110 lcd(LCD_RST, LCD_CE, LCD_DC, LCD_DIN, LCD_CLK, LCD_BL);
 
 // Keypad setup
 #define KEYPAD_INPUT A0
+#define KEY_UP 5
+#define KEY_DOWN 3
+#define KEY_LEFT 1
+#define KEY_RIGHT 2
+#define KEY_ENTER 4
+
 AnalogKeypad keypad(KEYPAD_INPUT);
-bool keypad_callback(Keycode keycode);
+bool default_keypad_callback(Keycode keycode);
 
 // GPS module
-GPS gps(19,18);
+#if 1
+SoftwareSerial gpsPort(10,11);
+GPS gps(&gpsPort,&lcd,0);
+#else
+GPS gps(&Serial1,&lcd,0);
+#endif
+bool gps_keypad_callback(Keycode keycode);
+bool gps_menu_callback(void* item);
+bool gps_activated;
 
 // Menus
 bool mHello(void* item);
 bool mSettings_backlight(void* item);
 bool mAbout(void* item);
 bool mBack(void* item);
-bool mGPS(void* item);
 
 
 //MenuItem menu_a1[] = {
@@ -86,7 +98,7 @@ MenuItem menu_settings[] = {
 		{NULL,NULL,NULL,NULL}
 } ;
 MenuItem menu_root[] = {
-		{"GPS Monitor","",mGPS,0},
+		{"GPS Monitor","",gps_menu_callback,0},
 		{"RPi Monitor","",mHello,0},
 		{"RFID Reader","",mHello,0},
 		{"Settings","",0,menu_settings},
@@ -108,7 +120,7 @@ void setup() {
 	lcd.setBacklight(OFF);
 
 	// Keypad init
-	keypad.init(keypad_callback,0,0,0);
+	keypad.init(default_keypad_callback,0,0,0);
 	menu.updateLCD();
 
 	// RFID module setup
@@ -120,36 +132,44 @@ void setup() {
 
 void loop(){
 	keypad.runloop();
-	rfidModule.loop();
 
-	gps.loop();
+	if(rfid_activated)
+		rfidModule.loop();
+
+	if(gps_activated)
+		gps.loop();
 }
 
 //-----------------------------------------
 // Keypad & menu callback implementations
 //-----------------------------------------
-bool keypad_callback(Keycode keycode){
+bool default_keypad_callback(Keycode keycode){
 	char buf[64];
 	snprintf(buf,64,"Key pressed: %d", keycode);
 	Serial.println(buf);
 	lcd.drawString(0,5,buf);
 
+	//FIXME call delegated method
+	if(gps_activated){
+		return gps_keypad_callback(keycode);
+	}
+
 	switch(keycode){
-	case 5: // up
+	case KEY_UP: // up
 		menu.prev();
 		return false; // allows key repeat
 		break;
-	case 3: // down
+	case KEY_DOWN: // down
 		menu.next();
 		return false; // allow key repeat
 		break;
-	case 4: // center
+	case KEY_ENTER: // center
 		menu.enter();
 		break;
-	case 1: // left
+	case KEY_LEFT: // left
 		menu.leave();
 		break;
-	case 2: // right
+	case KEY_RIGHT: // right
 		menu.enter();
 		break;
 	default:
@@ -158,13 +178,8 @@ bool keypad_callback(Keycode keycode){
 	return true; // done, do not repeat.
 }
 
-bool mGPS(void* item){
-	lcd.clear();
-	lcd.drawString(25,0,"GPS Info",true);
-	char buf[128];
-	snprintf(buf,128,"%s",((MenuItem*)item)->title);
-//	Serial.println(buf);
-	lcd.drawString(0,2,buf);
+bool mBack(void* item){
+	menu.leave();
 	return true;
 }
 
@@ -195,7 +210,44 @@ bool mAbout(void* item){
 	return true;
 }
 
-bool mBack(void* item){
-	menu.leave();
+// GPS Module
+bool gps_menu_callback(void* item){
+	if(!gps_activated){
+		// activate the gps modules
+		gps_activated = true;
+	}
+
+	// draw gps info on screen
+	lcd.clear();
+	lcd.setBacklight(1);
+	lcd.drawString(0,5,"GPS Recv...");
+//	lcd.drawString(25,0,"GPS Info",true);
+//	char buf[128];
+//	snprintf(buf,128,"%s",((MenuItem*)item)->title);
+//	Serial.println(buf);
+//	lcd.drawString(0,2,buf);
 	return true;
+}
+
+bool gps_keypad_callback(Keycode keycode){
+	switch (keycode) {
+	case KEY_LEFT: // leave gps module
+		if (gps_activated) {
+			//TODO - confirm for the GPS activation
+			gps_activated = false;
+			// move back
+			menu.leave();
+		}
+		menu.leave();
+		break;
+	case KEY_ENTER:
+		// TODO - press enter to pause update
+	default:
+		break;
+	}
+	return true; // done, do not repeat.
+}
+
+void gps_lcd_update(void){
+
 }

@@ -16,6 +16,7 @@
 
 #include <Arduino.h>
 #include <LCD/LCD5110.h>
+#include <Keypad/AnalogKeypad.h>
 #include "Menu.h"
 
 // Eliminate the GCC warning
@@ -24,9 +25,17 @@
 #define PROGMEM __attribute__((section(".progmem.data")))
 #endif
 
-// Shared components
+// DRIVERS
 extern Menu menu;
 extern LCD5110 lcd;
+
+// COMPONENTS
+//class Module{
+//	LCD5110 &_lcd;
+//	Menu &_menu;
+//	AnalogKeypad &_keypad;
+//	Module(LCD5110 &lcd,Menu &menu,AnalogKeypad &kp):_lcd(lcd),_menu(menu),_keypad(kp){};
+//};
 
 #ifdef __cplusplus
 extern "C" {

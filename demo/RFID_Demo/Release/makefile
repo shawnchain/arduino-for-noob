@@ -8,6 +8,7 @@ RM := rm -rf
 
 # All of the sources participating in the build are defined here
 -include sources.mk
+-include SoftwareSerial/subdir.mk
 -include SPI/subdir.mk
 -include JOYLABS_ARDUINO_LIBS/RFID/subdir.mk
 -include JOYLABS_ARDUINO_LIBS/LCD/subdir.mk
@@ -66,13 +67,13 @@ sizedummy \
 all: RFID_Demo.elf secondary-outputs
 
 dependents:
-	-cd /Users/shawn/Arduino/workspace/Arduino_Mega_2560_or_Mega_ADK/Release && $(MAKE) clean all
+	-cd /Users/shawn/Arduino/workspace/Arduino_Mega_2560_or_Mega_ADK/Release && $(MAKE) all
 
 # Tool invocations
 RFID_Demo.elf: $(OBJS) $(USER_OBJS) /Users/shawn/Arduino/workspace/Arduino_Mega_2560_or_Mega_ADK/Release/libArduino_Mega_2560_or_Mega_ADK.a
 	@echo 'Building target: $@'
 	@echo 'Invoking: AVR C++ Linker'
-	avr-gcc -Os -Wl,--gc-sections  -L"/Users/shawn/Arduino/workspace/Arduino_Mega_2560_or_Mega_ADK/Release" -mmcu=atmega2560  -o"RFID_Demo.elf" $(OBJS) $(USER_OBJS) $(LIBS) -lm
+	avr-gcc -Os -Wl,--gc-sections -L"/Users/shawn/Arduino/workspace/Arduino_Mega_2560_or_Mega_ADK/Release" -mmcu=atmega2560  -o"RFID_Demo.elf" $(OBJS) $(USER_OBJS) $(LIBS) -lm
 	@echo 'Finished building target: $@'
 	@echo ' '
 
