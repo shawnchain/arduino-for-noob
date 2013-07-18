@@ -13,6 +13,7 @@
 
 
 class LCD5110;
+class NMEA;
 
 class GPSInfo{
 	char* lat;
@@ -24,27 +25,24 @@ typedef void (*GPSCallback)(GPSInfo&);
 
 class GPS {
 public:
-	GPS(SoftwareSerial *gpsPort, LCD5110 *lcd, GPSCallback callback);
-	void init(void);
+	GPS(SoftwareSerial *serial, LCD5110 *lcd, GPSCallback callback);
+	GPS(HardwareSerial *serial, LCD5110 *lcd, GPSCallback callback);
+
+	void setup(int baud = 4800);
 	void loop(void);
 	void reset(void);
+	void sendCommand(char* cmd);
 
 private:
-
-	int _counter1; // counts how many bytes were received (max 300)
-	int _counter2; // counts how many commas were seen
-	int _offsets[13];
-	char _buf[300];
 	GPSCallback _callback;
-
-	int getSize(uint8_t offset);
-	int handleByte(int byteGPS);
-
-	SoftwareSerial *_gpsPort;
+	SoftwareSerial *gpsSwSerial;
+	HardwareSerial *gpsHwSerial;
 
 	LCD5110 *_lcd;
-
 	GPSInfo _gpsInfo;
-};
 
+	NMEA *_pNMEA;
+
+	int handleByte(int byteGPS);
+};
 #endif /* GPS_H_ */
