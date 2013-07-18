@@ -1,6 +1,7 @@
 // Do not remove the include below
 #include "DemoApp.h"
 #include "RFIDModule.h"
+
 #include "GPS/GPS.h"
 
 //---------------------------
@@ -47,12 +48,9 @@ AnalogKeypad keypad(KEYPAD_INPUT);
 bool default_keypad_callback(Keycode keycode);
 
 // GPS module
-#if 1
 SoftwareSerial gpsPort(10,11);
+
 GPS gps(&gpsPort,&lcd,0);
-#else
-GPS gps(&Serial1,&lcd,0);
-#endif
 bool gps_keypad_callback(Keycode keycode);
 bool gps_menu_callback(void* item);
 bool gps_activated;
@@ -127,7 +125,7 @@ void setup() {
 	rfidModule.setup();
 
 	// GPS module setup
-	gps.init();
+	gps.setup();
 }
 
 void loop(){
@@ -220,7 +218,7 @@ bool gps_menu_callback(void* item){
 	// draw gps info on screen
 	lcd.clear();
 	lcd.setBacklight(1);
-	lcd.drawString(0,5,"GPS Recv...");
+//	lcd.drawString(0,5,"GPS Info");
 //	lcd.drawString(25,0,"GPS Info",true);
 //	char buf[128];
 //	snprintf(buf,128,"%s",((MenuItem*)item)->title);
