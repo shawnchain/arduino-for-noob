@@ -50,39 +50,80 @@ int TGAM::parsePayload() {
 		return 0;
 	}
 
-	int i = 0, result = 0;
+	int i = 0;
+	int result = 0;
+	unsigned char hi = 0, lo = 0;
+
 	while (i < _payloadLength) {
 		int code = _payload[i++];
+		result = 1;
 		switch (code) {
 		case 0x02:
 			tgamData.signal = _payload[i++];
-			i = i + 2;
-			result = 1;
 			break;
 		case 0x04:
 			tgamData.attention = _payload[i++];
-			i = i + 2;
-			result = 1;
 			break;
 		case 0x05:
 			tgamData.meditation = _payload[i++];
-			result = 1;
 			break;
 		case 0x16:
 			tgamData.blink = _payload[i++];
-			result = 1;
+			break;
+		case 0x80: // the 2 bytes rqw data
+			hi = _payload[i++];
+			lo = _payload[i++];
+			if ((hi & 0xC0) == 0x80 && ((lo & 0xC0) == 0x40)) {
+				// this is a valid one
+				tgamData.raw = (hi << 8) + lo;
+			}
+			break;
+		case 0x83: // the 24 bytes frequency data, but we just read the last 2 bytes
+			i++;
+			hi = _payload[i++];
+			lo = _payload[i++];
+			tgamData.delta = ((hi << 8) + lo);
+			i++;
+			hi = _payload[i++];
+			lo = _payload[i++];
+			tgamData.theta = ((hi << 8) + lo);
+			i++;
+			hi = _payload[i++];
+			lo = _payload[i++];
+			tgamData.alphaLow = ((hi << 8) + lo);
+			i++;
+			hi = _payload[i++];
+			lo = _payload[i++];
+			tgamData.alphaHigh = ((hi << 8) + lo);
+			i++;
+			hi = _payload[i++];
+			lo = _payload[i++];
+			tgamData.betaLow = ((hi << 8) + lo);
+			i++;
+			hi = _payload[i++];
+			lo = _payload[i++];
+			tgamData.betaHigh = ((hi << 8) + lo);
+			i++;
+			hi = _payload[i++];
+			lo = _payload[i++];
+			tgamData.gammaHigh = ((hi << 8) + lo);
+			i++;
+			hi = _payload[i++];
+			lo = _payload[i++];
+			tgamData.gammaLow = ((hi << 8) + lo);
 			break;
 		default:
 			// unsupported
-			i++;
-		}
+			break;
+		};
 	}
 
 	// dump out
 	char buf[100];
 	if (result) {
-		snprintf(buf, 100, "sig:%d, att:%d, med:%d, blk:%d", tgamData.signal,
-				tgamData.attention, tgamData.meditation, tgamData.blink);
+		snprintf(buf, 100, "sig:%d, att:%d, med:%d, blk:%d, delta:%d, theta:%d",
+				tgamData.signal, tgamData.attention, tgamData.meditation,
+				tgamData.blink, tgamData.delta, tgamData.theta);
 	} else {
 		snprintf(buf, 100, "Unsupported packet, %d bytes", _payloadLength);
 	}
@@ -101,14 +142,15 @@ int TGAM::parsePayload() {
 int TGAM::handleByte(char byte) {
 	int returnValue = 0;
 	switch (_state) {
-	/* Waiting for SyncByte */
+
+	// initial state
 	case (STATE_SYNC0):
 		if (byte == SYNC_BYTE) {
 			_state = STATE_SYNC1;
 		}
 		break;
 
-		/* Waiting for second SyncByte */
+	// 2nd sync packet
 	case (STATE_SYNC1):
 		if (byte == SYNC_BYTE) {
 			_state = STATE_PAYLOAD_LEN;
@@ -117,7 +159,7 @@ int TGAM::handleByte(char byte) {
 		}
 		break;
 
-		/* Waiting for Data[] length */
+	// read payload length
 	case (STATE_PAYLOAD_LEN):
 		_payloadLength = byte;
 		if (_payloadLength > 170) {
@@ -137,7 +179,7 @@ int TGAM::handleByte(char byte) {
 		}
 		break;
 
-		/* Waiting for Payload[] bytes */
+	// read payloads
 	case (STATE_PAYLOAD):
 		_payload[_payloadReceived++] = byte;
 		_payloadSum = (unsigned char) (_payloadSum + byte);
@@ -146,7 +188,7 @@ int TGAM::handleByte(char byte) {
 		}
 		break;
 
-		/* Waiting for CKSUM byte */
+	// read and verify the checksum
 	case (STATE_CHECKSUM): {
 		_state = STATE_SYNC0;
 		unsigned char expectedSum = byte;
@@ -165,7 +207,7 @@ int TGAM::handleByte(char byte) {
 		break;
 	}
 
-		/* unrecognized state */
+	// unknown state
 	default:
 		_state = STATE_SYNC0;
 		break;

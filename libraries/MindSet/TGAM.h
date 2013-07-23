@@ -18,6 +18,18 @@ struct TGAMData{
 	char attention;
 	char meditation;
 	char blink;
+
+	uint16_t raw;
+
+	// more details
+	uint16_t delta;
+	uint16_t theta;
+	uint16_t alphaLow;
+	uint16_t alphaHigh;
+	uint16_t betaLow;
+	uint16_t betaHigh;
+	uint16_t gammaHigh;
+	uint16_t gammaLow;
 };
 
 typedef void (*TGAMCallback)(const TGAMData*);
